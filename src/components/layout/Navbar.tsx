@@ -50,19 +50,17 @@ const Navbar = () => {
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthPage ? (
-              <Link to="/">
-                <Button variant="ghost">← Back to Home</Button>
-              </Link>
+              <Button variant="ghost" asChild>
+                <Link to="/">← Back to Home</Link>
+              </Button>
             ) : (
               <>
-                <Link to="/login">
-                  <Button variant="ghost">Log In</Button>
-                </Link>
-                <Link to="/signup">
-                  <Button variant="hero" size="lg">
-                    Get Started
-                  </Button>
-                </Link>
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Log In</Link>
+                </Button>
+                <Button variant="hero" size="lg" asChild>
+                  <Link to="/signup">Get Started</Link>
+                </Button>
               </>
             )}
           </div>
@@ -102,12 +100,12 @@ const Navbar = () => {
                   </Link>
                 ))}
                 <div className="pt-4 space-y-2 border-t border-border/50">
-                  <Link to="/login" onClick={() => setIsOpen(false)}>
-                    <Button variant="outline" className="w-full">Log In</Button>
-                  </Link>
-                  <Link to="/signup" onClick={() => setIsOpen(false)}>
-                    <Button variant="hero" className="w-full">Get Started</Button>
-                  </Link>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link to="/login" onClick={() => setIsOpen(false)}>Log In</Link>
+                  </Button>
+                  <Button variant="hero" className="w-full" asChild>
+                    <Link to="/signup" onClick={() => setIsOpen(false)}>Get Started</Link>
+                  </Button>
                 </div>
               </div>
             </motion.div>

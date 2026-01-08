@@ -35,24 +35,26 @@ const CTASection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/signup">
-                <Button
-                  size="xl"
-                  className="bg-background text-primary hover:bg-background/90 font-semibold w-full sm:w-auto"
-                >
+              <Button
+                size="xl"
+                className="bg-background text-primary hover:bg-background/90 font-semibold w-full sm:w-auto"
+                asChild
+              >
+                <Link to="/signup">
                   Create Free Account
                   <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link to="/discover">
-                <Button
-                  variant="outline"
-                  size="xl"
-                  className="border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/20 w-full sm:w-auto"
-                >
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="xl"
+                className="border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/20 w-full sm:w-auto"
+                asChild
+              >
+                <Link to="/discover">
                   Browse Profiles First
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
 
             <p className="text-sm text-primary-foreground/60 mt-6">
