@@ -41,12 +41,12 @@ const Footer = () => {
                 <Heart className="h-5 w-5 text-primary-foreground" fill="currentColor" />
               </div>
               <span className="font-display text-xl font-semibold">
-                Spark<span className="text-gradient">Love</span>
+                Campus<span className="text-gradient">Love</span>
               </span>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Find your perfect match with our intelligent matchmaking algorithm. 
-              Join millions of singles who have found love on SparkLove.
+              Find your perfect match on campus with our intelligent matchmaking algorithm. 
+              Join thousands of students who have found love on CampusLove.
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social) => (
@@ -114,7 +114,7 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} SparkLove. All rights reserved.
+            © {new Date().getFullYear()} CampusLove. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1">
             Made with <Heart className="h-4 w-4 text-primary animate-heart-beat" fill="currentColor" /> for lovers everywhere

@@ -39,14 +39,14 @@ const HeroSection = () => {
             </div>
 
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-              Where <span className="text-gradient">Love</span> Stories
+              Where <span className="text-gradient">Campus Love</span> Stories
               <br />
               Begin
             </h1>
 
             <p className="text-lg text-muted-foreground mb-8 max-w-lg mx-auto lg:mx-0">
-              Join millions of singles looking for meaningful connections. 
-              Our intelligent matchmaking helps you find someone who truly gets you.
+              Join thousands of students looking for meaningful connections on campus. 
+              Our intelligent matchmaking helps you find your perfect match.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
