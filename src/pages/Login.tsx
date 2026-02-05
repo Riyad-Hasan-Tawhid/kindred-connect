@@ -1,21 +1,35 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Heart, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { signIn } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic
-    console.log("Login:", { email, password });
+    setLoading(true);
+    
+    try {
+      await signIn(email, password);
+      toast.success("Welcome back!");
+      navigate("/discover");
+    } catch (error: any) {
+      toast.error(error.message || "Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,7 +53,7 @@ const Login = () => {
                 Welcome Back
               </h1>
               <p className="text-muted-foreground">
-                Sign in to continue finding your perfect match
+                Sign in to continue finding your perfect match on campus
               </p>
             </div>
 
@@ -97,8 +111,8 @@ const Login = () => {
                   </div>
                 </div>
 
-                <Button type="submit" variant="hero" className="w-full" size="lg">
-                  Sign In
+                <Button type="submit" variant="hero" className="w-full" size="lg" disabled={loading}>
+                  {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
 

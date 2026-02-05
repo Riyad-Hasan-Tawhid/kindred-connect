@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu, X, User, MessageCircle, Search } from "lucide-react";
+import { Heart, Menu, X, User, MessageCircle, Search, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
 
   const navLinks = [
@@ -25,7 +29,7 @@ const Navbar = () => {
               <Heart className="h-5 w-5 text-primary-foreground" fill="currentColor" />
             </div>
             <span className="font-display text-xl font-semibold text-foreground">
-              Spark<span className="text-gradient">Love</span>
+              Campus<span className="text-gradient">Love</span>
             </span>
           </Link>
 
@@ -53,6 +57,30 @@ const Navbar = () => {
               <Button variant="ghost" asChild>
                 <Link to="/">← Back to Home</Link>
               </Button>
+            ) : user ? (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/profile">
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </Link>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={async () => {
+                    try {
+                      await signOut();
+                      toast.success("Signed out successfully");
+                      navigate("/");
+                    } catch (error) {
+                      toast.error("Error signing out");
+                    }
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </>
             ) : (
               <>
                 <Button variant="ghost" asChild>
@@ -100,12 +128,42 @@ const Navbar = () => {
                   </Link>
                 ))}
                 <div className="pt-4 space-y-2 border-t border-border/50">
+                  {user ? (
+                    <>
+                      <Button variant="outline" className="w-full" asChild>
+                        <Link to="/profile" onClick={() => setIsOpen(false)}>
+                          <User className="h-4 w-4 mr-2" />
+                          Profile
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full"
+                        onClick={async () => {
+                          try {
+                            await signOut();
+                            toast.success("Signed out successfully");
+                            navigate("/");
+                            setIsOpen(false);
+                          } catch (error) {
+                            toast.error("Error signing out");
+                          }
+                        }}
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <>
                   <Button variant="outline" className="w-full" asChild>
                     <Link to="/login" onClick={() => setIsOpen(false)}>Log In</Link>
                   </Button>
                   <Button variant="hero" className="w-full" asChild>
                     <Link to="/signup" onClick={() => setIsOpen(false)}>Get Started</Link>
                   </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

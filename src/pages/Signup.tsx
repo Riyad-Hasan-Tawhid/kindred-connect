@@ -1,15 +1,21 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Heart, Mail, Lock, Eye, EyeOff, User, Calendar, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -25,12 +31,26 @@ const Signup = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step < 3) {
       setStep(step + 1);
     } else {
-      console.log("Signup:", formData);
+      setLoading(true);
+      try {
+        // Sign up user with metadata
+        await signUp(formData.email, formData.password, {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+        });
+        
+        toast.success("Account created! Please check your email to verify your account.");
+        navigate("/login");
+      } catch (error: any) {
+        toast.error(error.message || "Error creating account");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -55,7 +75,7 @@ const Signup = () => {
                 Create Account
               </h1>
               <p className="text-muted-foreground">
-                Start your journey to finding love
+                Start your journey to finding love on campus
               </p>
             </div>
 
@@ -278,7 +298,7 @@ const Signup = () => {
                     </Button>
                   )}
                   <Button type="submit" variant="hero" className="flex-1" size="lg">
-                    {step < 3 ? "Continue" : "Create Account"}
+                    {loading ? "Creating..." : step < 3 ? "Continue" : "Create Account"}
                   </Button>
                 </div>
               </form>
