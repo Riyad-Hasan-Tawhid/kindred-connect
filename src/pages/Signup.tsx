@@ -31,21 +31,74 @@ const Signup = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validateStep = (): boolean => {
+    if (step === 1) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        toast.error("Please enter a valid email address");
+        return false;
+      }
+      if (formData.password.length < 6) {
+        toast.error("Password must be at least 6 characters long");
+        return false;
+      }
+    }
+    if (step === 2) {
+      if (!formData.firstName.trim()) {
+        toast.error("Please enter your first name");
+        return false;
+      }
+      if (!formData.birthday) {
+        toast.error("Please enter your birthday");
+        return false;
+      }
+      if (!formData.gender) {
+        toast.error("Please select your gender");
+        return false;
+      }
+    }
+    if (step === 3) {
+      if (!formData.location.trim()) {
+        toast.error("Please enter your location");
+        return false;
+      }
+      if (!formData.lookingFor) {
+        toast.error("Please select who you're looking for");
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateStep()) {
+      return;
+    }
+
     if (step < 3) {
       setStep(step + 1);
     } else {
       setLoading(true);
       try {
-        // Sign up user with metadata
-        await signUp(formData.email, formData.password, {
+        // Sign up user with all profile metadata
+        const result = await signUp(formData.email, formData.password, {
           first_name: formData.firstName,
           last_name: formData.lastName,
+          birthday: formData.birthday,
+          gender: formData.gender,
+          location: formData.location,
+          looking_for: formData.lookingFor,
         });
         
-        toast.success("Account created! Please check your email to verify your account.");
-        navigate("/login");
+        if (result.needsEmailConfirmation) {
+          toast.success("Account created! Please check your email to verify your account.");
+          navigate("/login");
+        } else {
+          toast.success("Welcome to Campus Love!");
+          navigate("/profile");
+        }
       } catch (error: any) {
         toast.error(error.message || "Error creating account");
       } finally {
