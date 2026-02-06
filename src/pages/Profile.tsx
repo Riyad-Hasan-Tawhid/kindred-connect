@@ -1,20 +1,20 @@
- import { useState, useEffect } from "react";
- import { useNavigate } from "react-router-dom";
- import Navbar from "@/components/layout/Navbar";
- import { Button } from "@/components/ui/button";
- import { Input } from "@/components/ui/input";
- import { Label } from "@/components/ui/label";
- import { Textarea } from "@/components/ui/textarea";
- import { Heart, User, Calendar, MapPin, Edit2, Save, Camera } from "lucide-react";
- import { motion } from "framer-motion";
- import { useAuth } from "@/contexts/AuthContext";
- import { useProfile } from "@/hooks/useProfile";
- import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "@/components/layout/Navbar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Edit2, Save } from "lucide-react";
+import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
+import AvatarUpload from "@/components/profile/AvatarUpload";
  
  const Profile = () => {
    const navigate = useNavigate();
    const { user, loading: authLoading } = useAuth();
-   const { profile, loading: profileLoading, updateProfile } = useProfile();
+   const { profile, loading: profileLoading, updateProfile, refetch } = useProfile();
    const [isEditing, setIsEditing] = useState(false);
    const [saving, setSaving] = useState(false);
    const [formData, setFormData] = useState({
@@ -79,24 +79,19 @@
              animate={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.5 }}
            >
-             {/* Header */}
-             <div className="text-center mb-8">
-               <div className="relative inline-block mb-4">
-                 <div className="w-32 h-32 rounded-full gradient-primary flex items-center justify-center">
-                   {profile?.avatar_url ? (
-                     <img
-                       src={profile.avatar_url}
-                       alt="Profile"
-                       className="w-full h-full rounded-full object-cover"
-                     />
-                   ) : (
-                     <User className="h-16 w-16 text-primary-foreground" />
-                   )}
-                 </div>
-                 <button className="absolute bottom-0 right-0 p-2 rounded-full bg-card border border-border shadow-sm hover:bg-muted transition-colors">
-                   <Camera className="h-5 w-5" />
-                 </button>
-               </div>
+              {/* Header */}
+              <div className="text-center mb-8">
+                <div className="mb-4">
+                  <AvatarUpload
+                    currentAvatarUrl={profile?.avatar_url || null}
+                    onUploadComplete={(url) => {
+                      // Profile is automatically updated in the component
+                      // Just trigger a refetch to update the local state
+                      refetch();
+                    }}
+                    size="lg"
+                  />
+                </div>
                <h1 className="font-display text-3xl font-bold mb-2">
                  {profile?.first_name || "Your"} {profile?.last_name || "Profile"}
                </h1>
