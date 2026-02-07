@@ -14,12 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
+      love_requests: {
+        Row: {
+          created_at: string
+          id: string
+          receiver_id: string
+          sender_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          receiver_id: string
+          sender_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          receiver_id?: string
+          sender_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          created_at: string
+          id: string
+          user1_id: string
+          user2_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user1_id: string
+          user2_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user1_id?: string
+          user2_id?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean
+          match_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          match_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          match_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          reaction_type: string
+          target_profile_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reaction_type: string
+          target_profile_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          target_profile_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
           birthday: string | null
           created_at: string
+          dislike_count: number
           email: string | null
           first_name: string | null
           gender: string | null
@@ -28,6 +136,7 @@ export type Database = {
           is_premium: boolean | null
           is_verified: boolean | null
           last_name: string | null
+          like_count: number
           location: string | null
           looking_for: string | null
           updated_at: string
@@ -38,6 +147,7 @@ export type Database = {
           bio?: string | null
           birthday?: string | null
           created_at?: string
+          dislike_count?: number
           email?: string | null
           first_name?: string | null
           gender?: string | null
@@ -46,6 +156,7 @@ export type Database = {
           is_premium?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
+          like_count?: number
           location?: string | null
           looking_for?: string | null
           updated_at?: string
@@ -56,6 +167,7 @@ export type Database = {
           bio?: string | null
           birthday?: string | null
           created_at?: string
+          dislike_count?: number
           email?: string | null
           first_name?: string | null
           gender?: string | null
@@ -64,6 +176,7 @@ export type Database = {
           is_premium?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
+          like_count?: number
           location?: string | null
           looking_for?: string | null
           updated_at?: string

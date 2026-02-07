@@ -22,6 +22,8 @@ export interface DiscoverProfileWithMeta extends DiscoverProfile {
   compatibility: number;
   occupation: string;
   image: string;
+  like_count: number;
+  dislike_count: number;
 }
 
 const calculateAge = (birthday: string | null): number | null => {
@@ -118,6 +120,8 @@ export const useDiscoverProfiles = (options: UseDiscoverProfilesOptions = {}) =>
             ),
             occupation: profile.looking_for || "Looking for connection",
             image: profile.avatar_url || DEFAULT_AVATAR,
+            like_count: (profile as any).like_count ?? 0,
+            dislike_count: (profile as any).dislike_count ?? 0,
           };
         })
         .filter((profile) => {

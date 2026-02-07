@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import ProfileCard from "@/components/ui/ProfileCard";
 import ProfileCardSkeleton from "@/components/discover/ProfileCardSkeleton";
@@ -8,7 +8,8 @@ import { SlidersHorizontal, Users, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDiscoverProfiles } from "@/hooks/useDiscoverProfiles";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import { useReactions } from "@/hooks/useReactions";
+import { useLoveRequests } from "@/hooks/useLoveRequests";
 
 const Discover = () => {
   const { user } = useAuth();
@@ -30,7 +31,39 @@ const Discover = () => {
     lookingFor: "",
   });
 
+  // Track reactions and love statuses per profile
+  const [profileReactions, setProfileReactions] = useState<Record<string, 'like' | 'dislike' | null>>({});
+  const [profileLoveStatuses, setProfileLoveStatuses] = useState<Record<string, 'pending' | 'accepted' | 'rejected' | 'none'>>({});
+
   const { profiles, loading, error, refetch, totalCount } = useDiscoverProfiles(appliedFilters);
+  const { addReaction, checkReaction } = useReactions();
+  const { sendLoveRequest, checkLoveRequestStatus } = useLoveRequests();
+
+  // Load existing reactions and love statuses for current profile
+  useEffect(() => {
+    const loadProfileStatuses = async () => {
+      if (!profiles.length) return;
+      
+      const currentProfile = profiles[currentIndex];
+      if (!currentProfile) return;
+
+      // Check if we already have the status cached
+      if (profileReactions[currentProfile.id] !== undefined && 
+          profileLoveStatuses[currentProfile.user_id] !== undefined) {
+        return;
+      }
+
+      // Load reaction status
+      const reaction = await checkReaction(currentProfile.id);
+      setProfileReactions(prev => ({ ...prev, [currentProfile.id]: reaction }));
+
+      // Load love request status
+      const loveStatus = await checkLoveRequestStatus(currentProfile.user_id);
+      setProfileLoveStatuses(prev => ({ ...prev, [currentProfile.user_id]: loveStatus }));
+    };
+
+    loadProfileStatuses();
+  }, [profiles, currentIndex, checkReaction, checkLoveRequestStatus, profileReactions, profileLoveStatuses]);
 
   const handleApplyFilters = useCallback(() => {
     setAppliedFilters({
@@ -51,22 +84,47 @@ const Discover = () => {
     setLookingFor("");
   }, []);
 
-  const handleLike = useCallback(() => {
-    toast.success("You liked this profile! 💕");
-    setCurrentIndex((prev) => prev + 1);
-  }, []);
+  const handleLike = useCallback(async () => {
+    const profile = profiles[currentIndex];
+    if (!profile) return false;
+    
+    const success = await addReaction(profile.id, 'like');
+    if (success) {
+      setProfileReactions(prev => ({ ...prev, [profile.id]: 'like' }));
+    }
+    return success;
+  }, [profiles, currentIndex, addReaction]);
 
-  const handlePass = useCallback(() => {
-    setCurrentIndex((prev) => prev + 1);
-  }, []);
+  const handleDislike = useCallback(async () => {
+    const profile = profiles[currentIndex];
+    if (!profile) return false;
+    
+    const success = await addReaction(profile.id, 'dislike');
+    if (success) {
+      setProfileReactions(prev => ({ ...prev, [profile.id]: 'dislike' }));
+    }
+    return success;
+  }, [profiles, currentIndex, addReaction]);
 
-  const handleSuperLike = useCallback(() => {
-    toast.success("Super Like sent! ⭐");
+  const handleLove = useCallback(async () => {
+    const profile = profiles[currentIndex];
+    if (!profile) return false;
+    
+    const success = await sendLoveRequest(profile.user_id);
+    if (success) {
+      setProfileLoveStatuses(prev => ({ ...prev, [profile.user_id]: 'pending' }));
+    }
+    return success;
+  }, [profiles, currentIndex, sendLoveRequest]);
+
+  const handleNext = useCallback(() => {
     setCurrentIndex((prev) => prev + 1);
   }, []);
 
   const handleRefresh = useCallback(() => {
     setCurrentIndex(0);
+    setProfileReactions({});
+    setProfileLoveStatuses({});
     refetch();
   }, [refetch]);
 
@@ -192,6 +250,8 @@ const Discover = () => {
               <AnimatePresence mode="wait">
                 <ProfileCard
                   key={currentProfile.id}
+                  id={currentProfile.id}
+                  userId={currentProfile.user_id}
                   name={`${currentProfile.first_name || "Anonymous"}${currentProfile.last_name ? ` ${currentProfile.last_name}` : ""}`}
                   age={currentProfile.age || 0}
                   location={currentProfile.location || "Nearby"}
@@ -200,9 +260,13 @@ const Discover = () => {
                   image={currentProfile.image}
                   compatibility={currentProfile.compatibility}
                   interests={currentProfile.interests || []}
+                  likeCount={currentProfile.like_count}
+                  dislikeCount={currentProfile.dislike_count}
                   onLike={handleLike}
-                  onPass={handlePass}
-                  onSuperLike={handleSuperLike}
+                  onDislike={handleDislike}
+                  onLove={handleLove}
+                  existingReaction={profileReactions[currentProfile.id]}
+                  loveStatus={profileLoveStatuses[currentProfile.user_id]}
                 />
               </AnimatePresence>
             ) : (
@@ -225,6 +289,15 @@ const Discover = () => {
               </motion.div>
             )}
           </div>
+
+          {/* Next button for navigation */}
+          {!loading && !error && profiles.length > 0 && currentIndex < profiles.length && (
+            <div className="flex justify-center mt-4">
+              <Button variant="ghost" onClick={handleNext} className="text-muted-foreground">
+                Skip to next profile →
+              </Button>
+            </div>
+          )}
         </div>
       </main>
     </div>
