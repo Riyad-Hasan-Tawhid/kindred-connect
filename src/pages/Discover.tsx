@@ -1,74 +1,99 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Navbar from "@/components/layout/Navbar";
 import ProfileCard from "@/components/ui/ProfileCard";
+import ProfileCardSkeleton from "@/components/discover/ProfileCardSkeleton";
+import DiscoverFilters from "@/components/discover/DiscoverFilters";
 import { Button } from "@/components/ui/button";
-import { Filter, SlidersHorizontal, MapPin, Users } from "lucide-react";
+import { SlidersHorizontal, Users, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const mockProfiles = [
-  {
-    id: 1,
-    name: "Emma Watson",
-    age: 28,
-    location: "New York, NY",
-    occupation: "Interior Designer",
-    bio: "Creative soul who loves art galleries, sunset walks, and discovering hidden coffee shops. Looking for someone to share adventures with!",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=800&fit=crop",
-    compatibility: 95,
-    interests: ["Art", "Travel", "Coffee", "Photography"],
-  },
-  {
-    id: 2,
-    name: "Sophia Miller",
-    age: 26,
-    location: "Los Angeles, CA",
-    occupation: "Marketing Manager",
-    bio: "Fitness enthusiast and foodie. I believe in balance - gym in the morning, tacos at night. Let's explore the city together!",
-    image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&h=800&fit=crop",
-    compatibility: 88,
-    interests: ["Fitness", "Food", "Hiking", "Music"],
-  },
-  {
-    id: 3,
-    name: "Olivia Chen",
-    age: 29,
-    location: "San Francisco, CA",
-    occupation: "Software Engineer",
-    bio: "Tech geek by day, book worm by night. I'm looking for someone who can recommend their favorite books and debate about sci-fi movies.",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=800&fit=crop",
-    compatibility: 92,
-    interests: ["Books", "Tech", "Sci-Fi", "Board Games"],
-  },
-  {
-    id: 4,
-    name: "Isabella Rose",
-    age: 27,
-    location: "Chicago, IL",
-    occupation: "Nurse",
-    bio: "Caring by nature. Love cooking Italian food, weekend brunches, and long conversations. Looking for genuine connection.",
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&h=800&fit=crop",
-    compatibility: 85,
-    interests: ["Cooking", "Healthcare", "Wine", "Travel"],
-  },
-];
+import { useDiscoverProfiles } from "@/hooks/useDiscoverProfiles";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Discover = () => {
+  const { user } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Filter state
+  const [ageMin, setAgeMin] = useState(18);
+  const [ageMax, setAgeMax] = useState(100);
+  const [location, setLocation] = useState("");
+  const [distance, setDistance] = useState("anywhere");
+  const [lookingFor, setLookingFor] = useState("");
+  
+  // Applied filters (only update on Apply click)
+  const [appliedFilters, setAppliedFilters] = useState({
+    ageMin: 18,
+    ageMax: 100,
+    location: "",
+    lookingFor: "",
+  });
 
-  const handleLike = () => {
-    setCurrentIndex((prev) => Math.min(prev + 1, mockProfiles.length - 1));
-  };
+  const { profiles, loading, error, refetch, totalCount } = useDiscoverProfiles(appliedFilters);
 
-  const handlePass = () => {
-    setCurrentIndex((prev) => Math.min(prev + 1, mockProfiles.length - 1));
-  };
+  const handleApplyFilters = useCallback(() => {
+    setAppliedFilters({
+      ageMin,
+      ageMax,
+      location,
+      lookingFor,
+    });
+    setCurrentIndex(0);
+    setShowFilters(false);
+  }, [ageMin, ageMax, location, lookingFor]);
 
-  const handleSuperLike = () => {
-    setCurrentIndex((prev) => Math.min(prev + 1, mockProfiles.length - 1));
-  };
+  const handleResetFilters = useCallback(() => {
+    setAgeMin(18);
+    setAgeMax(100);
+    setLocation("");
+    setDistance("anywhere");
+    setLookingFor("");
+  }, []);
 
-  const currentProfile = mockProfiles[currentIndex];
+  const handleLike = useCallback(() => {
+    toast.success("You liked this profile! 💕");
+    setCurrentIndex((prev) => prev + 1);
+  }, []);
+
+  const handlePass = useCallback(() => {
+    setCurrentIndex((prev) => prev + 1);
+  }, []);
+
+  const handleSuperLike = useCallback(() => {
+    toast.success("Super Like sent! ⭐");
+    setCurrentIndex((prev) => prev + 1);
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    setCurrentIndex(0);
+    refetch();
+  }, [refetch]);
+
+  const currentProfile = profiles[currentIndex];
+
+  // Not logged in state
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="pt-24 pb-12">
+          <div className="container mx-auto px-4 text-center">
+            <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+              <Users className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <h3 className="font-display text-2xl font-bold mb-2">Sign In to Discover</h3>
+            <p className="text-muted-foreground mb-6">
+              Create an account or sign in to start discovering matches.
+            </p>
+            <Button onClick={() => window.location.href = "/login"}>
+              Sign In
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -84,11 +109,20 @@ const Discover = () => {
               </h1>
               <p className="text-muted-foreground flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                {mockProfiles.length} profiles near you
+                {loading ? "Loading..." : `${totalCount} profiles available`}
               </p>
             </div>
             
             <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleRefresh}
+                disabled={loading}
+                className="gap-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
@@ -103,82 +137,69 @@ const Discover = () => {
           {/* Filters Panel */}
           <AnimatePresence>
             {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-card rounded-2xl p-6 mb-8 shadow-card border border-border/50 overflow-hidden"
-              >
-                <div className="grid md:grid-cols-4 gap-6">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Age Range</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        placeholder="Min"
-                        className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm"
-                        defaultValue={18}
-                      />
-                      <span className="text-muted-foreground">-</span>
-                      <input
-                        type="number"
-                        placeholder="Max"
-                        className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm"
-                        defaultValue={40}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Location</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <input
-                        type="text"
-                        placeholder="City or ZIP"
-                        className="w-full pl-10 pr-3 py-2 rounded-lg border border-input bg-background text-sm"
-                        defaultValue="New York, NY"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Distance</label>
-                    <select className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm">
-                      <option>10 miles</option>
-                      <option>25 miles</option>
-                      <option>50 miles</option>
-                      <option>100 miles</option>
-                      <option>Anywhere</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Looking For</label>
-                    <select className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm">
-                      <option>Relationship</option>
-                      <option>Casual Dating</option>
-                      <option>Friendship</option>
-                      <option>Not Sure Yet</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end gap-3 mt-6">
-                  <Button variant="ghost">Reset</Button>
-                  <Button>Apply Filters</Button>
-                </div>
-              </motion.div>
+              <DiscoverFilters
+                ageMin={ageMin}
+                ageMax={ageMax}
+                location={location}
+                distance={distance}
+                lookingFor={lookingFor}
+                onAgeMinChange={setAgeMin}
+                onAgeMaxChange={setAgeMax}
+                onLocationChange={setLocation}
+                onDistanceChange={setDistance}
+                onLookingForChange={setLookingFor}
+                onReset={handleResetFilters}
+                onApply={handleApplyFilters}
+              />
             )}
           </AnimatePresence>
 
           {/* Profile Cards */}
           <div className="flex justify-center">
-            {currentIndex < mockProfiles.length ? (
+            {loading ? (
+              <ProfileCardSkeleton />
+            ) : error ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-16"
+              >
+                <div className="w-24 h-24 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-6">
+                  <Users className="h-12 w-12 text-destructive" />
+                </div>
+                <h3 className="font-display text-2xl font-bold mb-2">Error Loading Profiles</h3>
+                <p className="text-muted-foreground mb-6">{error}</p>
+                <Button onClick={handleRefresh}>Try Again</Button>
+              </motion.div>
+            ) : profiles.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-16"
+              >
+                <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+                  <Users className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h3 className="font-display text-2xl font-bold mb-2">No Profiles Yet</h3>
+                <p className="text-muted-foreground mb-6">
+                  Be the first to complete your profile and start matching!
+                </p>
+                <Button onClick={() => window.location.href = "/profile"}>
+                  Complete Your Profile
+                </Button>
+              </motion.div>
+            ) : currentIndex < profiles.length ? (
               <AnimatePresence mode="wait">
                 <ProfileCard
                   key={currentProfile.id}
-                  {...currentProfile}
+                  name={`${currentProfile.first_name || "Anonymous"}${currentProfile.last_name ? ` ${currentProfile.last_name}` : ""}`}
+                  age={currentProfile.age || 0}
+                  location={currentProfile.location || "Nearby"}
+                  occupation={currentProfile.occupation}
+                  bio={currentProfile.bio || "No bio yet"}
+                  image={currentProfile.image}
+                  compatibility={currentProfile.compatibility}
+                  interests={currentProfile.interests || []}
                   onLike={handleLike}
                   onPass={handlePass}
                   onSuperLike={handleSuperLike}
@@ -195,10 +216,11 @@ const Discover = () => {
                 </div>
                 <h3 className="font-display text-2xl font-bold mb-2">No More Profiles</h3>
                 <p className="text-muted-foreground mb-6">
-                  You've seen all available matches in your area.
+                  You've seen all available matches. Check back later for new profiles!
                 </p>
-                <Button onClick={() => setCurrentIndex(0)}>
-                  Start Over
+                <Button onClick={handleRefresh}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh Profiles
                 </Button>
               </motion.div>
             )}
