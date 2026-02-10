@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 interface DiscoverFiltersProps {
   ageMin: number;
   ageMax: number;
-  location: string;
-  distance: string;
+  gender: string;
+  division: string;
+  educationLevel: string;
   lookingFor: string;
   onAgeMinChange: (value: number) => void;
   onAgeMaxChange: (value: number) => void;
-  onLocationChange: (value: string) => void;
-  onDistanceChange: (value: string) => void;
+  onGenderChange: (value: string) => void;
+  onDivisionChange: (value: string) => void;
+  onEducationLevelChange: (value: string) => void;
   onLookingForChange: (value: string) => void;
   onReset: () => void;
   onApply: () => void;
@@ -20,13 +22,15 @@ interface DiscoverFiltersProps {
 const DiscoverFilters = ({
   ageMin,
   ageMax,
-  location,
-  distance,
+  gender,
+  division,
+  educationLevel,
   lookingFor,
   onAgeMinChange,
   onAgeMaxChange,
-  onLocationChange,
-  onDistanceChange,
+  onGenderChange,
+  onDivisionChange,
+  onEducationLevelChange,
   onLookingForChange,
   onReset,
   onApply,
@@ -38,7 +42,7 @@ const DiscoverFilters = ({
       exit={{ opacity: 0, height: 0 }}
       className="bg-card rounded-2xl p-6 mb-8 shadow-card border border-border/50 overflow-hidden"
     >
-      <div className="grid md:grid-cols-4 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
         <div>
           <label className="text-sm font-medium mb-2 block">Age Range</label>
           <div className="flex items-center gap-2">
@@ -65,31 +69,50 @@ const DiscoverFilters = ({
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Location</label>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="City or ZIP"
-              className="w-full pl-10 pr-3 py-2 rounded-lg border border-input bg-background text-sm"
-              value={location}
-              onChange={(e) => onLocationChange(e.target.value)}
-            />
-          </div>
+          <label className="text-sm font-medium mb-2 block">Gender</label>
+          <select
+            className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm"
+            value={gender}
+            onChange={(e) => onGenderChange(e.target.value)}
+          >
+            <option value="">Any</option>
+            <option value="woman">Woman</option>
+            <option value="man">Man</option>
+            <option value="non-binary">Non-binary</option>
+            <option value="other">Other</option>
+          </select>
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Distance</label>
+          <label className="text-sm font-medium mb-2 block">Division</label>
           <select
             className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm"
-            value={distance}
-            onChange={(e) => onDistanceChange(e.target.value)}
+            value={division}
+            onChange={(e) => onDivisionChange(e.target.value)}
           >
-            <option value="10">10 miles</option>
-            <option value="25">25 miles</option>
-            <option value="50">50 miles</option>
-            <option value="100">100 miles</option>
-            <option value="anywhere">Anywhere</option>
+            <option value="">Any</option>
+            <option value="Dhaka">Dhaka</option>
+            <option value="Chattogram">Chattogram</option>
+            <option value="Rajshahi">Rajshahi</option>
+            <option value="Khulna">Khulna</option>
+            <option value="Barishal">Barishal</option>
+            <option value="Sylhet">Sylhet</option>
+            <option value="Rangpur">Rangpur</option>
+            <option value="Mymensingh">Mymensingh</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-2 block">Education Level</label>
+          <select
+            className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm"
+            value={educationLevel}
+            onChange={(e) => onEducationLevelChange(e.target.value)}
+          >
+            <option value="">Any</option>
+            <option value="School">School</option>
+            <option value="College">College</option>
+            <option value="University">University</option>
           </select>
         </div>
 
@@ -101,8 +124,8 @@ const DiscoverFilters = ({
             onChange={(e) => onLookingForChange(e.target.value)}
           >
             <option value="">Any</option>
-            <option value="Relationship">Relationship</option>
             <option value="Casual Dating">Casual Dating</option>
+            <option value="Relationship">Relationship</option>
             <option value="Friendship">Friendship</option>
             <option value="Not Sure Yet">Not Sure Yet</option>
           </select>

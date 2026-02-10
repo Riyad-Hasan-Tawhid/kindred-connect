@@ -19,15 +19,18 @@ const Discover = () => {
   // Filter state
   const [ageMin, setAgeMin] = useState(18);
   const [ageMax, setAgeMax] = useState(100);
-  const [location, setLocation] = useState("");
-  const [distance, setDistance] = useState("anywhere");
+  const [gender, setGender] = useState("");
+  const [division, setDivision] = useState("");
+  const [educationLevel, setEducationLevel] = useState("");
   const [lookingFor, setLookingFor] = useState("");
   
   // Applied filters (only update on Apply click)
   const [appliedFilters, setAppliedFilters] = useState({
     ageMin: 18,
     ageMax: 100,
-    location: "",
+    gender: "",
+    division: "",
+    educationLevel: "",
     lookingFor: "",
   });
 
@@ -69,18 +72,21 @@ const Discover = () => {
     setAppliedFilters({
       ageMin,
       ageMax,
-      location,
+      gender,
+      division,
+      educationLevel,
       lookingFor,
     });
     setCurrentIndex(0);
     setShowFilters(false);
-  }, [ageMin, ageMax, location, lookingFor]);
+  }, [ageMin, ageMax, gender, division, educationLevel, lookingFor]);
 
   const handleResetFilters = useCallback(() => {
     setAgeMin(18);
     setAgeMax(100);
-    setLocation("");
-    setDistance("anywhere");
+    setGender("");
+    setDivision("");
+    setEducationLevel("");
     setLookingFor("");
   }, []);
 
@@ -198,13 +204,15 @@ const Discover = () => {
               <DiscoverFilters
                 ageMin={ageMin}
                 ageMax={ageMax}
-                location={location}
-                distance={distance}
+                gender={gender}
+                division={division}
+                educationLevel={educationLevel}
                 lookingFor={lookingFor}
                 onAgeMinChange={setAgeMin}
                 onAgeMaxChange={setAgeMax}
-                onLocationChange={setLocation}
-                onDistanceChange={setDistance}
+                onGenderChange={setGender}
+                onDivisionChange={setDivision}
+                onEducationLevelChange={setEducationLevel}
                 onLookingForChange={setLookingFor}
                 onReset={handleResetFilters}
                 onApply={handleApplyFilters}
@@ -262,6 +270,10 @@ const Discover = () => {
                   interests={currentProfile.interests || []}
                   likeCount={currentProfile.like_count}
                   dislikeCount={currentProfile.dislike_count}
+                  educationLevel={(currentProfile as any).education_level}
+                  instituteName={(currentProfile as any).institute_name}
+                  division={(currentProfile as any).division}
+                  lookingFor={currentProfile.__raw_looking_for || undefined}
                   onLike={handleLike}
                   onDislike={handleDislike}
                   onLove={handleLove}
