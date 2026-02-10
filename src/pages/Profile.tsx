@@ -17,15 +17,18 @@ import AvatarUpload from "@/components/profile/AvatarUpload";
    const { profile, loading: profileLoading, updateProfile, refetch } = useProfile();
    const [isEditing, setIsEditing] = useState(false);
    const [saving, setSaving] = useState(false);
-   const [formData, setFormData] = useState({
-     first_name: "",
-     last_name: "",
-     birthday: "",
-     gender: "",
-     location: "",
-     looking_for: "",
-     bio: "",
-   });
+    const [formData, setFormData] = useState({
+      first_name: "",
+      last_name: "",
+      birthday: "",
+      gender: "",
+      location: "",
+      looking_for: "",
+      bio: "",
+      education_level: "",
+      institute_name: "",
+      division: "",
+    });
  
    useEffect(() => {
      if (!authLoading && !user) {
@@ -35,15 +38,18 @@ import AvatarUpload from "@/components/profile/AvatarUpload";
  
    useEffect(() => {
      if (profile) {
-       setFormData({
-         first_name: profile.first_name || "",
-         last_name: profile.last_name || "",
-         birthday: profile.birthday || "",
-         gender: profile.gender || "",
-         location: profile.location || "",
-         looking_for: profile.looking_for || "",
-         bio: profile.bio || "",
-       });
+        setFormData({
+          first_name: profile.first_name || "",
+          last_name: profile.last_name || "",
+          birthday: profile.birthday || "",
+          gender: profile.gender || "",
+          location: profile.location || "",
+          looking_for: profile.looking_for || "",
+          bio: profile.bio || "",
+          education_level: (profile as any).education_level || "",
+          institute_name: (profile as any).institute_name || "",
+          division: (profile as any).division || "",
+        });
      }
    }, [profile]);
  
@@ -190,25 +196,77 @@ import AvatarUpload from "@/components/profile/AvatarUpload";
                    />
                  </div>
  
-                 <div className="space-y-2">
-                   <Label htmlFor="looking_for">Looking For</Label>
-                   <select
-                     id="looking_for"
-                     name="looking_for"
-                     className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm disabled:opacity-50"
-                     value={formData.looking_for}
-                     onChange={handleChange}
-                     disabled={!isEditing}
-                   >
-                     <option value="">Select...</option>
-                     <option value="women">Women</option>
-                     <option value="men">Men</option>
-                     <option value="everyone">Everyone</option>
-                   </select>
-                 </div>
- 
-                 <div className="space-y-2">
-                   <Label htmlFor="bio">Bio</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="looking_for">Looking For</Label>
+                    <select
+                      id="looking_for"
+                      name="looking_for"
+                      className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm disabled:opacity-50"
+                      value={formData.looking_for}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                    >
+                      <option value="">Select...</option>
+                      <option value="Casual Dating">Casual Dating</option>
+                      <option value="Relationship">Relationship</option>
+                      <option value="Friendship">Friendship</option>
+                      <option value="Not Sure Yet">Not Sure Yet</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="education_level">Current Education Level</Label>
+                    <select
+                      id="education_level"
+                      name="education_level"
+                      className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm disabled:opacity-50"
+                      value={formData.education_level}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                    >
+                      <option value="">Select...</option>
+                      <option value="School">School</option>
+                      <option value="College">College</option>
+                      <option value="University">University</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="institute_name">Currently Studying At</Label>
+                    <Input
+                      id="institute_name"
+                      name="institute_name"
+                      placeholder="Institute name (optional)"
+                      value={formData.institute_name}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="division">Division</Label>
+                    <select
+                      id="division"
+                      name="division"
+                      className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm disabled:opacity-50"
+                      value={formData.division}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                    >
+                      <option value="">Select...</option>
+                      <option value="Dhaka">Dhaka</option>
+                      <option value="Chattogram">Chattogram</option>
+                      <option value="Rajshahi">Rajshahi</option>
+                      <option value="Khulna">Khulna</option>
+                      <option value="Barishal">Barishal</option>
+                      <option value="Sylhet">Sylhet</option>
+                      <option value="Rangpur">Rangpur</option>
+                      <option value="Mymensingh">Mymensingh</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bio">Bio</Label>
                    <Textarea
                      id="bio"
                      name="bio"
@@ -229,15 +287,18 @@ import AvatarUpload from "@/components/profile/AvatarUpload";
                      onClick={() => {
                        setIsEditing(false);
                        if (profile) {
-                         setFormData({
-                           first_name: profile.first_name || "",
-                           last_name: profile.last_name || "",
-                           birthday: profile.birthday || "",
-                           gender: profile.gender || "",
-                           location: profile.location || "",
-                           looking_for: profile.looking_for || "",
-                           bio: profile.bio || "",
-                         });
+                          setFormData({
+                            first_name: profile.first_name || "",
+                            last_name: profile.last_name || "",
+                            birthday: profile.birthday || "",
+                            gender: profile.gender || "",
+                            location: profile.location || "",
+                            looking_for: profile.looking_for || "",
+                            bio: profile.bio || "",
+                            education_level: (profile as any).education_level || "",
+                            institute_name: (profile as any).institute_name || "",
+                            division: (profile as any).division || "",
+                          });
                        }
                      }}
                    >

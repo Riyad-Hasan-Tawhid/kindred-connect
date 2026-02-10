@@ -1,4 +1,4 @@
-import { Heart, ThumbsUp, ThumbsDown, Loader2, MapPin, Briefcase } from "lucide-react";
+import { Heart, ThumbsUp, ThumbsDown, Loader2, MapPin, GraduationCap, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
@@ -15,6 +15,10 @@ interface ProfileCardProps {
   interests: string[];
   likeCount?: number;
   dislikeCount?: number;
+  educationLevel?: string;
+  instituteName?: string;
+  division?: string;
+  lookingFor?: string;
   onLike?: () => Promise<boolean>;
   onDislike?: () => Promise<boolean>;
   onLove?: () => Promise<boolean>;
@@ -35,6 +39,10 @@ const ProfileCard = ({
   interests,
   likeCount = 0,
   dislikeCount = 0,
+  educationLevel,
+  instituteName,
+  division,
+  lookingFor,
   onLike,
   onDislike,
   onLove,
@@ -137,16 +145,29 @@ const ProfileCard = ({
           <h3 className="font-display text-2xl font-bold text-primary-foreground mb-1">
             {name}, {age}
           </h3>
-          {occupation && (
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-sm mb-1">
-              <Briefcase className="h-4 w-4" />
-              {occupation}
-            </div>
-          )}
-          <div className="flex items-center gap-2 text-primary-foreground/80 text-sm">
-            <MapPin className="h-4 w-4" />
-            {location}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-primary-foreground/80 text-sm">
+            {division && (
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {division}
+              </span>
+            )}
+            {educationLevel && (
+              <span className="flex items-center gap-1">
+                <GraduationCap className="h-3.5 w-3.5" />
+                {educationLevel}
+              </span>
+            )}
+            {lookingFor && (
+              <span className="flex items-center gap-1">
+                <Search className="h-3.5 w-3.5" />
+                {lookingFor}
+              </span>
+            )}
           </div>
+          {instituteName && (
+            <p className="text-primary-foreground/60 text-xs mt-1">{instituteName}</p>
+          )}
         </div>
       </div>
 

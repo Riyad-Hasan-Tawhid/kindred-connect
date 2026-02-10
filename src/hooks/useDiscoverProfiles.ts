@@ -24,6 +24,7 @@ export interface DiscoverProfileWithMeta extends DiscoverProfile {
   image: string;
   like_count: number;
   dislike_count: number;
+  __raw_looking_for?: string | null;
 }
 
 const calculateAge = (birthday: string | null): number | null => {
@@ -59,7 +60,9 @@ const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69
 interface UseDiscoverProfilesOptions {
   ageMin?: number;
   ageMax?: number;
-  location?: string;
+  gender?: string;
+  division?: string;
+  educationLevel?: string;
   lookingFor?: string;
 }
 
@@ -122,19 +125,36 @@ export const useDiscoverProfiles = (options: UseDiscoverProfilesOptions = {}) =>
             image: profile.avatar_url || DEFAULT_AVATAR,
             like_count: (profile as any).like_count ?? 0,
             dislike_count: (profile as any).dislike_count ?? 0,
+            __raw_looking_for: profile.looking_for,
           };
         })
         .filter((profile) => {
-          // Apply age filters
           if (options.ageMin && profile.age && profile.age < options.ageMin) return false;
           if (options.ageMax && profile.age && profile.age > options.ageMax) return false;
           
-          // Apply location filter
-          if (options.location && profile.location) {
-            const locationMatch = profile.location
-              .toLowerCase()
-              .includes(options.location.toLowerCase());
-            if (!locationMatch) return false;
+          if (options.gender && (profile as any).gender) {
+            if ((profile as any).gender !== options.gender) return false;
+          } else if (options.gender && !(profile as any).gender) {
+            return false;
+          }
+
+          if (options.division && (profile as any).division) {
+            if ((profile as any).division !== options.division) return false;
+          } else if (options.division && !(profile as any).division) {
+            return false;
+          }
+
+          if (options.educationLevel && (profile as any).education_level) {
+            if ((profile as any).education_level !== options.educationLevel) return false;
+          } else if (options.educationLevel && !(profile as any).education_level) {
+            return false;
+          }
+
+          if (options.lookingFor && profile.occupation) {
+            // looking_for is stored in occupation field mapping
+            const profileLookingFor = (profile as any).__raw_looking_for;
+            if (profileLookingFor && profileLookingFor !== options.lookingFor) return false;
+            if (!profileLookingFor) return false;
           }
           
           return true;
@@ -147,7 +167,7 @@ export const useDiscoverProfiles = (options: UseDiscoverProfilesOptions = {}) =>
     } finally {
       setLoading(false);
     }
-  }, [user, options.ageMin, options.ageMax, options.location]);
+  }, [user, options.ageMin, options.ageMax, options.gender, options.division, options.educationLevel, options.lookingFor]);
 
   useEffect(() => {
     fetchProfiles();

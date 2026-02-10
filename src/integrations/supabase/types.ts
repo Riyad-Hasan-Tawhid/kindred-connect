@@ -128,10 +128,13 @@ export type Database = {
           birthday: string | null
           created_at: string
           dislike_count: number
+          division: string | null
+          education_level: string | null
           email: string | null
           first_name: string | null
           gender: string | null
           id: string
+          institute_name: string | null
           interests: string[] | null
           is_premium: boolean | null
           is_verified: boolean | null
@@ -148,10 +151,13 @@ export type Database = {
           birthday?: string | null
           created_at?: string
           dislike_count?: number
+          division?: string | null
+          education_level?: string | null
           email?: string | null
           first_name?: string | null
           gender?: string | null
           id?: string
+          institute_name?: string | null
           interests?: string[] | null
           is_premium?: boolean | null
           is_verified?: boolean | null
@@ -168,10 +174,13 @@ export type Database = {
           birthday?: string | null
           created_at?: string
           dislike_count?: number
+          division?: string | null
+          education_level?: string | null
           email?: string | null
           first_name?: string | null
           gender?: string | null
           id?: string
+          institute_name?: string | null
           interests?: string[] | null
           is_premium?: boolean | null
           is_verified?: boolean | null
