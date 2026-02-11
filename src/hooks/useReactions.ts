@@ -18,7 +18,7 @@ export const useReactions = () => {
 
     setLoading(true);
     try {
-      // First check if reaction already exists
+      // Check if reaction already exists
       const { data: existing } = await supabase
         .from("profile_reactions")
         .select("id, reaction_type")
@@ -27,11 +27,36 @@ export const useReactions = () => {
         .maybeSingle();
 
       if (existing) {
-        toast.info(`You've already ${existing.reaction_type === 'like' ? 'liked' : 'disliked'} this profile`);
-        return false;
+        if (existing.reaction_type === reactionType) {
+          toast.info(`You've already ${reactionType === 'like' ? 'liked' : 'disliked'} this profile`);
+          return false;
+        }
+
+        // Toggle: switch from one reaction to the other
+        // Delete old reaction
+        await supabase
+          .from("profile_reactions")
+          .delete()
+          .eq("id", existing.id);
+
+        // Decrement old count
+        const oldColumn = existing.reaction_type === 'like' ? 'like_count' : 'dislike_count';
+        const { data: oldProfile } = await supabase
+          .from("profiles")
+          .select(`${oldColumn}`)
+          .eq("id", targetProfileId)
+          .single();
+
+        if (oldProfile) {
+          const oldCount = Math.max(0, ((oldProfile as any)[oldColumn] || 0) - 1);
+          await supabase
+            .from("profiles")
+            .update({ [oldColumn]: oldCount })
+            .eq("id", targetProfileId);
+        }
       }
 
-      // Insert the reaction
+      // Insert the new reaction
       const { error: insertError } = await supabase
         .from("profile_reactions")
         .insert({
@@ -46,21 +71,19 @@ export const useReactions = () => {
         return false;
       }
 
-      // Update the profile's like/dislike count
-      const column = reactionType === 'like' ? 'like_count' : 'dislike_count';
-      
-      // Get current count
+      // Increment new count
+      const newColumn = reactionType === 'like' ? 'like_count' : 'dislike_count';
       const { data: profile } = await supabase
         .from("profiles")
-        .select(column)
+        .select(newColumn)
         .eq("id", targetProfileId)
         .single();
 
       if (profile) {
-        const currentCount = (profile as any)[column] || 0;
+        const currentCount = (profile as any)[newColumn] || 0;
         await supabase
           .from("profiles")
-          .update({ [column]: currentCount + 1 })
+          .update({ [newColumn]: currentCount + 1 })
           .eq("id", targetProfileId);
       }
 
