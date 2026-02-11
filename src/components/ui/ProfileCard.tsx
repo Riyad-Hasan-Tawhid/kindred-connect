@@ -64,7 +64,7 @@ const ProfileCard = ({
   }, [loveStatus]);
 
   const handleLike = async () => {
-    if (hasReacted || isLiking || !onLike) return;
+    if (hasReacted === 'like' || isLiking || !onLike) return;
     setIsLiking(true);
     const success = await onLike();
     if (success) {
@@ -74,7 +74,7 @@ const ProfileCard = ({
   };
 
   const handleDislike = async () => {
-    if (hasReacted || isDisliking || !onDislike) return;
+    if (hasReacted === 'dislike' || isDisliking || !onDislike) return;
     setIsDisliking(true);
     const success = await onDislike();
     if (success) {
@@ -194,9 +194,9 @@ const ProfileCard = ({
           <div className="flex items-center justify-center gap-4">
             <motion.button
               onClick={handleDislike}
-              disabled={hasReacted !== null || isDisliking}
+              disabled={hasReacted === 'dislike' || isDisliking}
               whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: hasReacted === null ? 1.05 : 1 }}
+              whileHover={{ scale: hasReacted !== 'dislike' ? 1.05 : 1 }}
               className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 shadow-md
                 ${hasReacted === 'dislike' 
                   ? 'bg-muted text-muted-foreground ring-2 ring-muted-foreground' 
@@ -214,9 +214,9 @@ const ProfileCard = ({
             
             <motion.button
               onClick={handleLike}
-              disabled={hasReacted !== null || isLiking}
+              disabled={hasReacted === 'like' || isLiking}
               whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: hasReacted === null ? 1.05 : 1 }}
+              whileHover={{ scale: hasReacted !== 'like' ? 1.05 : 1 }}
               className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 shadow-md
                 ${hasReacted === 'like' 
                   ? 'bg-green-500 text-white ring-2 ring-green-400' 

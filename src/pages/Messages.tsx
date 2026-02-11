@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Send, MessageCircleHeart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMatches } from "@/hooks/useMatches";
 import { useMessages } from "@/hooks/useMessages";
+import { usePremium } from "@/hooks/usePremium";
 import ConversationList from "@/components/messages/ConversationList";
 import ChatHeader from "@/components/messages/ChatHeader";
 import ChatMessages from "@/components/messages/ChatMessages";
@@ -18,8 +19,15 @@ const Messages = () => {
   const { matches, loading: matchesLoading } = useMatches();
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(id || null);
   const { messages, loading: messagesLoading, sending, sendMessage } = useMessages(selectedMatchId);
+  const { isPremium } = usePremium();
 
   const selectedMatch = matches.find((m) => m.id === selectedMatchId);
+
+  // Count messages sent by current user in this conversation
+  const myMessageCount = useMemo(() => {
+    if (!user) return 0;
+    return messages.filter((m) => m.sender_id === user.id).length;
+  }, [messages, user]);
 
   useEffect(() => {
     if (id) setSelectedMatchId(id);
@@ -94,7 +102,12 @@ const Messages = () => {
                   userId={user.id}
                   partnerName={selectedMatch.partner_profile.first_name || "your match"}
                 />
-                <ChatInput onSend={sendMessage} sending={sending} />
+                <ChatInput
+                  onSend={sendMessage}
+                  sending={sending}
+                  messageCount={myMessageCount}
+                  isPremium={isPremium}
+                />
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center">
